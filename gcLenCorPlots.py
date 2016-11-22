@@ -12,7 +12,7 @@ parser.add_argument('-i', '--input', help='either a fastq or fasta file, must en
 parser.add_argument('-t', '--plotTitle')
 parser.add_argument('-m', '--method', help='options: mean, median')
 parser.add_argument('-ec', '--errorbarColor', help='desired error bar color in hex color, default is grey', default='grey') 
-parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 1k to 10k, perc colors by percentage of total, max colors based on minimum and maximum read counts')
+parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 1k to 10k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='num')
 
 args = parser.parse_args()
 
@@ -38,7 +38,7 @@ dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'coun
 #limit options
 plt.xlim(15, 75)
 plt.ylim(20, 200)
-plt.suptitle(args.plotTitle)
+plt.suptitle(args.plotTitle + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 plt.xlabel('GC content (%)')
 plt.ylabel('Read length (bp)')
 
@@ -46,14 +46,16 @@ plt.ylabel('Read length (bp)')
 cm = plt.cm.get_cmap('rainbow')
 plt.errorbar(dfGrouped['gcContent', args.method], dfGrouped['length', ''], xerr=dfGrouped['gcContent', 'std'], linestyle="None", marker="None", color=args.errorbarColor)
 
-#plot by number of reads, range from 1k to 10k
-plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=1000, vmax=10000, marker='o', edgecolors='None', s=25, zorder=2)
-
-#plot by percentage instead
-#plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['perc']), cmap=cm, vmin=0.0, vmax=1.0, marker='o', edgecolors='None', s=25, zorder=2)
-
-#plot by min to max count?
-#plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=min(dfGrouped['gcContent', 'count']), vmax=max(dfGrouped['gcContent', 'count']), marker='o', edgecolors='None', s=25, zorder=2)
+#color range options
+if args.range == 'num':
+	#plot by number of reads, range from 1k to 10k
+	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=1000, vmax=10000, marker='o', edgecolors='None', s=25, zorder=2)
+elif args.range == 'perc':
+	#plot by percentage instead
+	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['perc']), cmap=cm, vmin=0.0, vmax=1.0, marker='o', edgecolors='None', s=25, zorder=2)
+elif args.range == 'max':
+	#plot by min to max count?
+	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=min(dfGrouped['gcContent', 'count']), vmax=max(dfGrouped['gcContent', 'count']), marker='o', edgecolors='None', s=25, zorder=2)
 
 plt.colorbar()
 plt.draw()
