@@ -31,19 +31,25 @@ print("Number of reads: %i" % len(gcContent))
 
 df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
 
+#some stats
+meanGC = np.mean(df['gcContent'])
+medianGC = np.median(df['gcContent'])
+print("Mean GC content: %.2f" % meanGC)
+print("Median GC content: %.2f" % medianGC)
+
 dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
 
 dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
 
 #limit options
-plt.xlim(15, 75)
+plt.xlim(15, 90)
 plt.ylim(20, 200)
 plt.suptitle(args.plotTitle + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 plt.xlabel('GC content (%)')
 plt.ylabel('Read length (bp)')
 
 #plot dat
-cm = plt.cm.get_cmap('rainbow')
+cm = plt.cm.get_cmap('YlOrRd')
 plt.errorbar(dfGrouped['gcContent', args.method], dfGrouped['length', ''], xerr=dfGrouped['gcContent', 'std'], linestyle="None", marker="None", color=args.errorbarColor)
 
 #color range options
