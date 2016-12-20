@@ -37,6 +37,9 @@ medianGC = np.median(df['gcContent'])
 print("Mean GC content: %.2f" % meanGC)
 print("Median GC content: %.2f" % medianGC)
 
+print("Fragment length range: %i : %i" % (min(df['length']), max(df['length'])))
+print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))
+
 dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
 
 dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
