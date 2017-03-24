@@ -6,6 +6,7 @@ import numpy as np
 from Bio import SeqIO
 from Bio.SeqUtils import GC
 import argparse
+import scipy
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', help='either a fastq or fasta file, must end with .fasta, .fna, .fa, .fastq, or .fq')
@@ -44,9 +45,13 @@ dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).rese
 
 dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
 
+#print out data
+with open('data_out.txt', 'w') as outfile:
+	dfGrouped.to_csv(outfile, sep="\t", index=False)
+
 #limit options
 plt.xlim(15, 90)
-plt.ylim(20, 200)
+plt.ylim(20, 60)
 plt.suptitle(args.plotTitle + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 plt.xlabel('GC content (%)')
 plt.ylabel('Read length (bp)')
