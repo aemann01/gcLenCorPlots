@@ -11,7 +11,7 @@ from scipy.stats import mannwhitneyu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', help='either a fastq or fasta file, must end with .fasta, .fna, .fa, .fastq, or .fq')
-parser.add_argument('-t', '--plotTitle')
+#parser.add_argument('-t', '--plotTitle')
 parser.add_argument('-m', '--method', help='options: mean, median')
 parser.add_argument('-ec', '--errorbarColor', help='desired error bar color in hex color, default is grey', default='grey') 
 parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 1k to 10k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='num')
@@ -41,7 +41,7 @@ print("Mean GC content: %.2f" % meanGC)
 print("Median GC content: %.2f" % medianGC)
 
 print("Fragment length range: %i : %i" % (min(df['length']), max(df['length'])))
-print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))
+print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))	
 
 dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
 
@@ -68,7 +68,7 @@ with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
 #limit options
 plt.xlim(15, 90)
 plt.ylim(20, 200)
-plt.suptitle(args.plotTitle + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
+plt.suptitle(args.input + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 plt.xlabel('GC content (%)')
 plt.ylabel('Read length (bp)')
 
