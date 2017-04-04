@@ -7,6 +7,7 @@ from Bio import SeqIO
 from Bio.SeqUtils import GC
 import argparse
 import scipy
+from scipy.stats import mannwhitneyu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', help='either a fastq or fasta file, must end with .fasta, .fna, .fa, .fastq, or .fq')
@@ -32,6 +33,7 @@ print("Number of reads: %i" % len(gcContent))
 
 df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
 
+##############Stats
 #some stats
 meanGC = np.mean(df['gcContent'])
 medianGC = np.median(df['gcContent'])
@@ -46,12 +48,26 @@ dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).rese
 dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
 
 #print out data
-with open('data_out.txt', 'w') as outfile:
+with open('%s_data_out.txt' % args.input, 'w') as outfile:
 	dfGrouped.to_csv(outfile, sep="\t", index=False)
+
+#calculate significance of each grouping, compared to overall distribution
+dfLensGroup = df.groupby(by='length')
+overall = df['gcContent']
+lines = []
+
+with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
+	for group, values in dfLensGroup:
+		testVec = dfLensGroup.get_group(group)['gcContent']
+		testRes = scipy.stats.mannwhitneyu(testVec, overall)
+		lines.append('{} \t {} \n'.format(group, testRes[1]))
+	fp.writelines(lines)
+
+#############Plotting
 
 #limit options
 plt.xlim(15, 90)
-plt.ylim(20, 60)
+plt.ylim(20, 200)
 plt.suptitle(args.plotTitle + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 plt.xlabel('GC content (%)')
 plt.ylabel('Read length (bp)')
@@ -73,4 +89,7 @@ elif args.range == 'max':
 
 plt.colorbar()
 plt.draw()
-plt.show() 
+plt.savefig('%s_plot.pdf' % args.input)
+
+#uncomment if you want to have interactive plot gui
+#plt.show() 
