@@ -8,13 +8,16 @@ from Bio.SeqUtils import GC
 import argparse
 import scipy
 from scipy.stats import mannwhitneyu
+from scipy.signal import resample
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', help='either a fastq or fasta file, must end with .fasta, .fna, .fa, .fastq, or .fq')
 #parser.add_argument('-t', '--plotTitle')
-parser.add_argument('-m', '--method', help='options: mean, median')
+parser.add_argument('-m', '--method', help='options: mean, median', default='mean')
 parser.add_argument('-ec', '--errorbarColor', help='desired error bar color in hex color, default is grey', default='grey') 
-parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 1k to 10k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='num')
+parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 100 to 2k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='max')
+parser.add_argument('-t', '--trim', help='Maximum length trim, numeric')
+parser.add_argument('-s', '--shuffle', help='Randomly shuffle results to a specific number')
 
 args = parser.parse_args()
 
@@ -32,6 +35,17 @@ else:
 print("Number of reads: %i" % len(gcContent))
 
 df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
+
+#optional trimming/shuffle options
+
+if args.trim is not None:
+	df = df.drop(df[df.length >= int(args.trim)].index).reset_index()
+	print("Length trimmed to maximum %i" % int(args.trim))
+	print("Number of trimmed reads: %i" % len(df.gcContent))
+
+if args.shuffle is not None:
+	df = df.sample(int(args.shuffle))
+	print("Number of reads normalized to %i" % int(args.shuffle))
 
 ##############Stats
 #some stats
@@ -56,12 +70,27 @@ dfLensGroup = df.groupby(by='length')
 overall = df['gcContent']
 lines = []
 
-with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
-	for group, values in dfLensGroup:
-		testVec = dfLensGroup.get_group(group)['gcContent']
-		testRes = scipy.stats.mannwhitneyu(testVec, overall)
-		lines.append('{} \t {} \n'.format(group, testRes[1]))
-	fp.writelines(lines)
+#with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
+#	for group, values in dfLensGroup:
+#		testVec = dfLensGroup.get_group(group)['gcContent']
+#		subSampLen = len(testVec)
+#		overallSub = np.random.choice(overall, size=subSampLen) 
+		#overallSub = scipy.signal.resample(overall, subSampLen)
+#		print(subSampLen)
+#		print(len(overallSub))
+#		testRes = scipy.stats.mannwhitneyu(testVec, overallSub)
+#		lines.append('{} \t {} \n'.format(group, testRes[1]))
+#	fp.writelines(lines)
+
+#t test
+#with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
+#        for group, values in dfLensGroup:
+#                testVec = dfLensGroup.get_group(group)['gcContent']
+#                testRes = scipy.stats.ttest_ind(testVec, overall)
+#                lines.append('{} \t {} \n'.format(group, testRes[1]))
+#        fp.writelines(lines)
+
+#scale transform deviation of median value from 
 
 #############Plotting
 
@@ -79,7 +108,7 @@ plt.errorbar(dfGrouped['gcContent', args.method], dfGrouped['length', ''], xerr=
 #color range options
 if args.range == 'num':
 	#plot by number of reads, range from 1k to 10k
-	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=1000, vmax=10000, marker='o', edgecolors='None', s=25, zorder=2)
+	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=100, vmax=2000, marker='o', edgecolors='None', s=25, zorder=2)
 elif args.range == 'perc':
 	#plot by percentage instead
 	plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['perc']), cmap=cm, vmin=0.0, vmax=1.0, marker='o', edgecolors='None', s=25, zorder=2)
