@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+'''Usage: python gcLenCorPlots.py -i <input fasta or fastq> [-m <method> -r <range for heatmap> -t <trim maximum length> -s <normalize to number> -ec <error bar color>]'''
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -39,7 +42,7 @@ df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
 #optional trimming/shuffle options
 
 if args.trim is not None:
-	df = df.drop(df[df.length >= int(args.trim)].index).reset_index()
+	df = df.drop(df[df.length > int(args.trim)].index).reset_index()
 	print("Length trimmed to maximum %i" % int(args.trim))
 	print("Number of trimmed reads: %i" % len(df.gcContent))
 
@@ -48,11 +51,11 @@ if args.shuffle is not None:
 	print("Number of reads normalized to %i" % int(args.shuffle))
 
 ##############Stats
-#some stats
-meanGC = np.mean(df['gcContent'])
-medianGC = np.median(df['gcContent'])
-print("Mean GC content: %.2f" % meanGC)
-print("Median GC content: %.2f" % medianGC)
+
+print("Mean GC content: %.2f" % np.mean(df['gcContent']))
+print("Median GC content: %.2f" % np.median(df['gcContent']))
+print("Mean fragment length: %i" % np.mean(df['length']))
+print("Median fragment length: %i" % np.median(df['length']))
 
 print("Fragment length range: %i : %i" % (min(df['length']), max(df['length'])))
 print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))	
