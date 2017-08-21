@@ -2,7 +2,6 @@
 
 '''Usage: python gcLenCorPlots.py -i <input fasta or fastq> [-m <method> -r <range for heatmap> -t <trim maximum length> -s <normalize to number> -ec <error bar color>]'''
 
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,7 +14,6 @@ from scipy.signal import resample
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', help='either a fastq or fasta file, must end with .fasta, .fna, .fa, .fastq, or .fq')
-#parser.add_argument('-t', '--plotTitle')
 parser.add_argument('-m', '--method', help='options: mean, median', default='mean')
 parser.add_argument('-ec', '--errorbarColor', help='desired error bar color in hex color, default is grey', default='grey') 
 parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 100 to 2k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='max')
@@ -40,7 +38,6 @@ print("Number of reads: %i" % len(gcContent))
 df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
 
 #optional trimming/shuffle options
-
 if args.trim is not None:
 	df = df.drop(df[df.length > int(args.trim)].index).reset_index()
 	print("Length trimmed to maximum %i" % int(args.trim))
@@ -50,18 +47,16 @@ if args.shuffle is not None:
 	df = df.sample(int(args.shuffle))
 	print("Number of reads normalized to %i" % int(args.shuffle))
 
-##############Stats
-
+#stats
 print("Mean GC content: %.2f" % np.mean(df['gcContent']))
 print("Median GC content: %.2f" % np.median(df['gcContent']))
 print("Mean fragment length: %i" % np.mean(df['length']))
 print("Median fragment length: %i" % np.median(df['length']))
-
 print("Fragment length range: %i : %i" % (min(df['length']), max(df['length'])))
 print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))	
 
+#grouped data
 dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
-
 dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
 
 #print out data
@@ -73,29 +68,7 @@ dfLensGroup = df.groupby(by='length')
 overall = df['gcContent']
 lines = []
 
-#with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
-#	for group, values in dfLensGroup:
-#		testVec = dfLensGroup.get_group(group)['gcContent']
-#		subSampLen = len(testVec)
-#		overallSub = np.random.choice(overall, size=subSampLen) 
-		#overallSub = scipy.signal.resample(overall, subSampLen)
-#		print(subSampLen)
-#		print(len(overallSub))
-#		testRes = scipy.stats.mannwhitneyu(testVec, overallSub)
-#		lines.append('{} \t {} \n'.format(group, testRes[1]))
-#	fp.writelines(lines)
-
-#t test
-#with open('%s_deviation_stats.txt' % args.input, 'w') as fp:
-#        for group, values in dfLensGroup:
-#                testVec = dfLensGroup.get_group(group)['gcContent']
-#                testRes = scipy.stats.ttest_ind(testVec, overall)
-#                lines.append('{} \t {} \n'.format(group, testRes[1]))
-#        fp.writelines(lines)
-
-#scale transform deviation of median value from 
-
-#############Plotting
+#plotting
 
 #limit options
 plt.xlim(15, 90)
@@ -123,5 +96,3 @@ plt.colorbar()
 plt.draw()
 plt.savefig('%s_plot.pdf' % args.input)
 
-#uncomment if you want to have interactive plot gui
-#plt.show() 
