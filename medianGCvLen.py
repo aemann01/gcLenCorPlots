@@ -34,14 +34,10 @@ for f in files:
 	gcContent = [GC(rec.seq) for rec in SeqIO.parse(f, args.type)]
 	lens = [len(rec) for rec in SeqIO.parse(f, args.type)]
 	print("Number of reads: %i" % len(gcContent))
-	
 	df = pd.DataFrame({'length':lens, 'gcContent':gcContent})
-	#print(df)
 	dfGrouped = df.groupby(by='length').agg(['count','median']).reset_index()
-	#print(dfGrouped)
-	#print(dfGrouped['gcContent', 'median'])
-#version below needs testing
-#	plt.plot(pd.Series.rolling(center=False, window=25).mean(dfGrouped['gcContent', 'median']), pd.Series.rolling(center=False, window=25).mean(dfGrouped['length', '']), label=f.replace(args.type, ""), linewidth=1.0, color=colors[i])
+	#version below needs testing
+	#plt.plot(pd.Series.rolling(center=False, window=25).mean(dfGrouped['gcContent', 'median']), pd.Series.rolling(center=False, window=25).mean(dfGrouped['length', '']), label=f.replace(args.type, ""), linewidth=1.0, color=colors[i])
 	plt.plot(pd.rolling_mean(dfGrouped['gcContent', 'median'], window=25), pd.rolling_mean(dfGrouped['length', ''], window=25), label=f.replace(args.type, ""), linewidth=1.0, color=colors[i])
 	i += 1
 	print('--')
