@@ -63,11 +63,6 @@ dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'coun
 with open('%s_data_out.txt' % args.input, 'w') as outfile:
 	dfGrouped.to_csv(outfile, sep="\t", index=False)
 
-#calculate significance of each grouping, compared to overall distribution
-dfLensGroup = df.groupby(by='length')
-overall = df['gcContent']
-lines = []
-
 #plotting
 
 #limit options
