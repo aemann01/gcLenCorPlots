@@ -76,8 +76,6 @@ def printStats(df):
 	plotDat(dfGrouped)
 
 def plotDat(dfGrouped):
-with open('%s_data_out.txt' % args.input, 'w') as outfile:
-	dfGrouped.to_csv(outfile, sep="\t", index=False)
 #plotting
 	plt.xlim(15, 90)
 	plt.ylim(20, 200)
@@ -99,7 +97,7 @@ with open('%s_data_out.txt' % args.input, 'w') as outfile:
 
 def main():
 	print("Author: Allison E. Mann (allison.mann@botany.ubc.ca)")
-	print("Copyright 2018: GPLv3.0")
+	print("Copyright 2018: GPLv3.0\n")
 	assert os.path.exists(args.input), 'Error! File does not exist: %s. Is the path correct?' % args.input
 	openFastx()
 main()
