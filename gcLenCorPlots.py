@@ -20,8 +20,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import argparse
-import scipy
-from scipy.stats import mannwhitneyu
 from scipy.signal import resample
 from Bio import SeqIO
 from Bio.SeqUtils import GC
@@ -49,8 +47,7 @@ def openFastx():
 	        print("File extension not recognized, see help file")
 	print("Number of reads: %i" % len(gcContent))
 	df = pd.DataFrame({'length': lens, 'gcContent': gcContent})
-#optional trimming/shuffle options
-	if args.trim is not None:
+	if args.trim is not None: #optional length trimming and shuffle options
 		df = df.drop(df[df.length > int(args.trim)].index).reset_index()
 		print("Length trimmed to maximum %i" % int(args.trim))
 		print("Number of trimmed reads: %i" % len(df.gcContent))
@@ -59,33 +56,28 @@ def openFastx():
 		print("Number of reads normalized to %i" % int(args.shuffle))
 	printStats(df)
 
-def printStats(df):
-#stats
+def printStats(df): #generate statistics, print to screen, print out the statistics file
 	print("Mean GC content: %.2f" % np.mean(df['gcContent']))
 	print("Median GC content: %.2f" % np.median(df['gcContent']))
 	print("Mean fragment length: %i" % np.mean(df['length']))
 	print("Median fragment length: %i" % np.median(df['length']))
 	print("Fragment length range: %i : %i" % (min(df['length']), max(df['length'])))
 	print("GC content range: %.2f : %.2f" % (min(df['gcContent']), max(df['gcContent'])))	
-#grouped data
 	dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
 	dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
-#print out data
 	with open('%s_data_out.txt' % args.input, 'w') as outfile:
 		dfGrouped.to_csv(outfile, sep="\t", index=False)
 	plotDat(dfGrouped)
 
 def plotDat(dfGrouped):
-#plotting
-	plt.xlim(15, 90)
-	plt.ylim(20, 200)
+	plt.xlim(15, 90) #change for new x axis range
+	plt.ylim(20, 200) #change this for new y axis range
 	plt.suptitle(args.input + "\n" + "n= " + str(dfGrouped['gcContent', 'count'].sum()))
 	plt.xlabel('GC content (%)')
 	plt.ylabel('Read length (bp)')
-	cm = plt.cm.get_cmap('YlOrRd')
+	cm = plt.cm.get_cmap('YlOrRd') #change this for color scheme other than yellow to red - for more options google matplotlib color maps
 	plt.errorbar(dfGrouped['gcContent', args.method], dfGrouped['length', ''], xerr=dfGrouped['gcContent', 'std'], linestyle="None", marker="None", color=args.errorbarColor)
-#color range options
-	if args.range == 'num':
+	if args.range == 'num': #color range options
 		plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=100, vmax=2000, marker='o', edgecolors='None', s=25, zorder=2)
 	elif args.range == 'perc':
 		plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['perc']), cmap=cm, vmin=0.0, vmax=1.0, marker='o', edgecolors='None', s=25, zorder=2)
