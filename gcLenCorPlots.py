@@ -71,17 +71,13 @@ def printStats(df):
 	dfGrouped = df.groupby(by='length').agg(['count', 'mean', 'median', 'std']).reset_index()
 	dfGrouped['perc'] = dfGrouped['gcContent', 'count']/dfGrouped['gcContent', 'count'].sum()
 #print out data
-<<<<<<< HEAD
 	with open('%s_data_out.txt' % args.input, 'w') as outfile:
 		dfGrouped.to_csv(outfile, sep="\t", index=False)
 	plotDat(dfGrouped)
 
 def plotDat(dfGrouped):
-=======
 with open('%s_data_out.txt' % args.input, 'w') as outfile:
 	dfGrouped.to_csv(outfile, sep="\t", index=False)
-
->>>>>>> 8eb6e2a96c07d801ba64cb84a3483d5bcff2e365
 #plotting
 	plt.xlim(15, 90)
 	plt.ylim(20, 200)
