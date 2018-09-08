@@ -3,6 +3,8 @@ This script calculates summary statistics for read length and GC content from a 
 
 Usage: python3 gcLenCorPlots.py -i [fastx] *optional:* -m [method] -r [range for heatmap] -t [trim maximum length] -s [normalize to number] -ec [error bar color]
 
+![example](username.github.com/aemann01/example.jpg)
+
 For help or parameter description: python3 gcLenCorPlots.py -h
 
 Requirements:
