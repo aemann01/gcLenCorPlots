@@ -88,7 +88,7 @@ def plotDat(dfGrouped):
 	plt.savefig('%s_plot.pdf' % args.input)
 
 def main():
-	print("Author: Allison E. Mann (allison.mann@botany.ubc.ca)")
+	print("Author: Allison E. Mann (allison.mann@unthsc.edu)")
 	print("Copyright 2018: GPLv3.0\n")
 	assert os.path.exists(args.input), 'Error! File does not exist: %s. Is the path correct?' % args.input
 	openFastx()
