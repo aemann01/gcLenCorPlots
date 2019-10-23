@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 '''Usage: python gcLenCorPlots.py -i <input fasta or fastq> [-m <method> -r <range for heatmap> -t <trim maximum length> -s <normalize to number> -ec <error bar color>]'''
 
 import pandas as pd
@@ -31,7 +18,6 @@ parser.add_argument('-ec', '--errorbarColor', help='desired error bar color in h
 parser.add_argument('-r', '--range', help='Range setting for the color bar. Accepted arguments: num, perc, max. Num colors by the absolute number of reads ranging from 100 to 2k, perc colors by percentage of total, max colors based on minimum and maximum read counts', default='max')
 parser.add_argument('-t', '--trim', help='Maximum length trim, numeric')
 parser.add_argument('-s', '--shuffle', help='Randomly shuffle results to a specific number')
-
 args = parser.parse_args()
 
 def openFastx():
@@ -78,7 +64,7 @@ def plotDat(dfGrouped):
 	cm = plt.cm.get_cmap('YlOrRd') #change this for color scheme other than yellow to red - for more options google matplotlib color maps
 	plt.errorbar(dfGrouped['gcContent', args.method], dfGrouped['length', ''], xerr=dfGrouped['gcContent', 'std'], linestyle="None", marker="None", color=args.errorbarColor)
 	if args.range == 'num': #color range options
-		plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=100, vmax=2000, marker='o', edgecolors='None', s=25, zorder=2)
+		plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['gcContent', 'count']), cmap=cm, vmin=100, vmax=2000, marker='o', edgecolors='None', s=25, zorder=2) #change vmin and vmax to alter range of absolute number of reads to custom number
 	elif args.range == 'perc':
 		plt.scatter(dfGrouped['gcContent', args.method], dfGrouped['length', ''], c=list(dfGrouped['perc']), cmap=cm, vmin=0.0, vmax=1.0, marker='o', edgecolors='None', s=25, zorder=2)
 	elif args.range == 'max':
@@ -89,10 +75,17 @@ def plotDat(dfGrouped):
 
 def main():
 	print("Author: Allison E. Mann (allison.mann@botany.ubc.ca)")
+	print("Cite: Mann AE et al. 2018. Differential preservation of endogenous human and microbial DNA in dental calculus and dentin. Scientific Reports 8:9822")
 	print("Copyright 2018: GPLv3.0\n")
 	assert os.path.exists(args.input), 'Error! File does not exist: %s. Is the path correct?' % args.input
 	openFastx()
+
 main()
+
+__author__ = "Allison E. Mann"
+__license__ = "GPL"
+__version__ = "1.0.1"
+__email__="allison.e.mann@gmail.com"
 
 	
 
