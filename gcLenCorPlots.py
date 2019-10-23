@@ -76,6 +76,7 @@ def plotDat(dfGrouped):
 def main():
 	print("Author: Allison E. Mann")
 	print("Cite: Mann AE et al. 2018. Differential preservation of endogenous human and microbial DNA in dental calculus and dentin. Scientific Reports 8:9822")
+	print("Author: Allison E. Mann (allison.mann@unthsc.edu)")
 	print("Copyright 2018: GPLv3.0\n")
 	assert os.path.exists(args.input), 'Error! File does not exist: %s. Is the path correct?' % args.input
 	openFastx()
